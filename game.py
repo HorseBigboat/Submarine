@@ -4,7 +4,7 @@ from sys import exit
 from random import randint
 
 
-class Hero(pygame.sprite.Sprite):
+class Hero(pygame.sprite.Sprite):   #英雄类
     def __init__(self, hero_image, hero_init_pos):
         pygame.sprite.Sprite.__init__(self)
         self.image = hero_image
@@ -13,7 +13,7 @@ class Hero(pygame.sprite.Sprite):
         self.speed = 6
         self.bombgroup = pygame.sprite.Group()
 
-    def move(self, offset):
+    def move(self, offset):   #定义英雄移动
         x = self.rect.left + offset[pygame.K_RIGHT] - offset[pygame.K_LEFT]
         if x < 0:
             self.rect.left = 0
@@ -22,12 +22,12 @@ class Hero(pygame.sprite.Sprite):
         else:
             self.rect.left = x
 
-    def single_bomb(self, bomb_image):
+    def single_bomb(self, bomb_image):     #定义单个炸弹，与英雄绑定
         single_bomb = Bomb(bomb_image, self.rect.midtop)
         self.bombgroup.add(single_bomb)
 
 
-class Bomb(pygame.sprite.Sprite):
+class Bomb(pygame.sprite.Sprite):   #炸弹类
     def __init__(self, bomb_image, bomb_init_pos):
         pygame.sprite.Sprite.__init__(self)
         self.image = bomb_image
@@ -41,7 +41,7 @@ class Bomb(pygame.sprite.Sprite):
             self.kill()
 
 
-class Enemy(pygame.sprite.Sprite):
+class Enemy(pygame.sprite.Sprite):   #敌人类
     def __init__(self, enemy_image, enemy_init_pos):
         pygame.sprite.Sprite.__init__(self)
         self.image = enemy_image
@@ -55,7 +55,7 @@ class Enemy(pygame.sprite.Sprite):
             self.kill()
 
 
-class Mine(pygame.sprite.Sprite):
+class Mine(pygame.sprite.Sprite):   #敌人水雷类
     def __init__(self, mine_image, mine_init_pos):
         pygame.sprite.Sprite.__init__(self)
         self.image = mine_image
