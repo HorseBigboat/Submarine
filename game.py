@@ -41,21 +41,6 @@ class Bomb(pygame.sprite.Sprite):
             self.kill()
 
 
-class Mine(pygame.sprite.Sprite):
-    def __init__(self, mine_image, mine_init_pos):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = mine_image
-        self.rect = self.image.get_rect()
-        self.rect.topleft = mine_init_pos
-        self.speed = 3
-
-    def update(self):
-        self.rect.top -= self.speed
-        if self.rect.top == 100:
-            self.kill()
-
-
-
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, enemy_image, enemy_init_pos):
         pygame.sprite.Sprite.__init__(self)
@@ -63,16 +48,26 @@ class Enemy(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.topleft = enemy_init_pos
         self.speed = 2
-        self.minegroup = pygame.sprite.Group()
 
     def update(self):
         self.rect.left += self.speed
         if self.rect.left > SCREEN_WIDTH:
             self.kill()
 
-    def single_mine(self, mine_image):
-        single_mine = Mine(mine_image, self.rect.midtop)
-        self.minegroup.add(single_mine)
+
+class Mine(pygame.sprite.Sprite):
+    def __init__(self, mine_image, mine_init_pos):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = mine_image
+        self.rect = self.image.get_rect()
+        self.rect.topleft = mine_init_pos
+        self.speed = 2
+
+    def update(self):
+        self.rect.top -= self.speed
+        if self.rect.top == 20:
+            self.kill()
+
 
 SCREEN_WIDTH = 640
 SCREEN_HEIGHT = 480
@@ -83,13 +78,11 @@ ticks = 0
 clock = pygame.time.Clock()
 offset = {pygame.K_LEFT: 0, pygame.K_RIGHT: 0}
 
-hero_pos = [300, 80]
-
 background = pygame.image.load('sea.png')
 hero_img = pygame.image.load('hero.png')
+hero_pos = [300, 80]
 bomb_img = pygame.image.load('bomb.png')
 enemy_img = pygame.image.load('enemy.png')
-mine_img = pygame.image.load('mine.png')
 
 pygame.init()
 screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
@@ -99,6 +92,8 @@ hero = Hero(hero_img, hero_pos)
 
 enemy_group = pygame.sprite.Group()
 enemy_down_group = pygame.sprite.Group()
+
+mine_group = pygame.sprite.Group()
 
 enemy_pos = [-enemy_img.get_width(), randint(120, 460)]
 enemy = Enemy(enemy_img, enemy_pos)
@@ -118,8 +113,18 @@ while True:
         enemy = Enemy(enemy_img, enemy_pos)
         enemy_group.add(enemy)
 
+    if ticks % 30 == 0:   #该处需要更改enemy放地雷的判断条件
+        mine_pos = [enemy.rect.left, enemy.rect.top]
+        mine = Mine(mine_image=pygame.image.load("mine.png"), mine_init_pos=mine_pos)
+        mine_group.add(mine)
+
+    mine_group.update()
+    mine_group.draw(screen)
+
     enemy_group.update()
     enemy_group.draw(screen)
+
+
 
     enemy_down_group.add(
         pygame.sprite.groupcollide(
@@ -138,7 +143,6 @@ while True:
                 offset[event.key] = hero.speed
             if event.key == K_SPACE:
                 hero.single_bomb(bomb_img)
-                enemy.single_mine(mine_img)
 
         elif event.type == pygame.KEYUP:
             if event.key in offset:
@@ -147,8 +151,5 @@ while True:
     hero.bombgroup.update()
     hero.bombgroup.draw(screen)
     hero.move(offset)
-
-    enemy.minegroup.update()
-    enemy.minegroup.draw(screen)
 
     pygame.display.update()
