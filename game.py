@@ -124,7 +124,7 @@ while True:
     enemy_group.update()
     enemy_group.draw(screen)
 
-
+    #此处需要加入minegroup和hero的碰撞
 
     enemy_down_group.add(
         pygame.sprite.groupcollide(
