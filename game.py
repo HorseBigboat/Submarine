@@ -113,7 +113,9 @@ while True:
         enemy = Enemy(enemy_img, enemy_pos)
         enemy_group.add(enemy)
 
-    if ticks % 30 == 0:   #该处需要更改enemy放地雷的判断条件
+    # 该处需要更改enemy放地雷的判断条件
+    # 更改为每一个enemy独立设置一个计时器，到一定的tick放mine
+    if ticks % 30 == 0:
         mine_pos = [enemy.rect.left, enemy.rect.top]
         mine = Mine(mine_image=pygame.image.load("mine.png"), mine_init_pos=mine_pos)
         mine_group.add(mine)
