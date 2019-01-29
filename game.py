@@ -4,7 +4,7 @@ from sys import exit
 from random import randint
 
 
-class Hero(pygame.sprite.Sprite):   #英雄类
+class Hero(pygame.sprite.Sprite):  # 英雄类
     def __init__(self, hero_image, hero_init_pos):
         pygame.sprite.Sprite.__init__(self)
         self.image = hero_image
@@ -13,7 +13,7 @@ class Hero(pygame.sprite.Sprite):   #英雄类
         self.speed = 6
         self.bombgroup = pygame.sprite.Group()
 
-    def move(self, offset):   #定义英雄移动
+    def move(self, offset):  # 定义英雄移动
         x = self.rect.left + offset[pygame.K_RIGHT] - offset[pygame.K_LEFT]
         if x < 0:
             self.rect.left = 0
@@ -22,12 +22,12 @@ class Hero(pygame.sprite.Sprite):   #英雄类
         else:
             self.rect.left = x
 
-    def single_bomb(self, bomb_image):     #定义单个炸弹，与英雄绑定
+    def single_bomb(self, bomb_image):  # 定义单个炸弹，与英雄绑定
         single_bomb = Bomb(bomb_image, self.rect.midtop)
         self.bombgroup.add(single_bomb)
 
 
-class Bomb(pygame.sprite.Sprite):   #炸弹类
+class Bomb(pygame.sprite.Sprite):  # 炸弹类
     def __init__(self, bomb_image, bomb_init_pos):
         pygame.sprite.Sprite.__init__(self)
         self.image = bomb_image
@@ -41,7 +41,7 @@ class Bomb(pygame.sprite.Sprite):   #炸弹类
             self.kill()
 
 
-class Enemy(pygame.sprite.Sprite):   #敌人类
+class Enemy(pygame.sprite.Sprite):  # 敌人类
     def __init__(self, enemy_image, enemy_init_pos):
         pygame.sprite.Sprite.__init__(self)
         self.image = enemy_image
@@ -55,7 +55,7 @@ class Enemy(pygame.sprite.Sprite):   #敌人类
             self.kill()
 
 
-class Mine(pygame.sprite.Sprite):   #敌人水雷类
+class Mine(pygame.sprite.Sprite):  # 敌人水雷类
     def __init__(self, mine_image, mine_init_pos):
         pygame.sprite.Sprite.__init__(self)
         self.image = mine_image
@@ -117,7 +117,8 @@ while True:
     # 更改为每一个enemy独立设置一个计时器，到一定的tick放mine
     if ticks % 30 == 0:
         mine_pos = [enemy.rect.left, enemy.rect.top]
-        mine = Mine(mine_image=pygame.image.load("mine.png"), mine_init_pos=mine_pos)
+        mine = Mine(mine_image=pygame.image.load(
+            "mine.png"), mine_init_pos=mine_pos)
         mine_group.add(mine)
 
     mine_group.update()
@@ -126,7 +127,7 @@ while True:
     enemy_group.update()
     enemy_group.draw(screen)
 
-    #此处需要加入minegroup和hero的碰撞
+    # 此处需要加入minegroup和hero的碰撞
 
     enemy_down_group.add(
         pygame.sprite.groupcollide(
