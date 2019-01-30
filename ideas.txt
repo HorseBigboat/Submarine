@@ -1,0 +1,7 @@
+ine_list = []
+file_full_path = 'D:\sample.txt'
+f = open(file_full_path, 'r+')
+l = f.readline()
+while l != '':
+   line_list.append(l)
+//line_list中存放了文本每一行的内容，可以根据需要做变换，再将line_list 写回到文本中即可
