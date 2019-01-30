@@ -4,6 +4,11 @@ from pygame.locals import *
 from sys import exit
 from random import randint
 
+SCREEN_WIDTH = 640
+SCREEN_HEIGHT = 480
+FRAME_RATE = 60
+ANIMATE_CYCLE = 60
+
 
 class Hero(pygame.sprite.Sprite):  # 英雄类
     def __init__(self, hero_image, hero_init_pos):
@@ -76,101 +81,113 @@ class Mine(pygame.sprite.Sprite):  # 敌人水雷类
             self.rect.top -= self.speed
 
 
-SCREEN_WIDTH = 640
-SCREEN_HEIGHT = 480
-FRAME_RATE = 60
-ANIMATE_CYCLE = 60
+def main():
+    pygame.init()
 
-ticks = 0
-clock = pygame.time.Clock()
-offset = {pygame.K_LEFT: 0, pygame.K_RIGHT: 0}
+    global SCREEN_WIDTH
+    global SCREEN_HEIGHT
+    screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
 
-background = pygame.image.load('sea.png')
-hero_img = pygame.image.load('hero.png')
-hero_pos = [300, 80]
-bomb_img = pygame.image.load('bomb.png')
-enemy_img = pygame.image.load('enemy.png')
-gameover = pygame.image.load('gameover.png')
+    pygame.display.set_caption("MINE")
+    run()
+    gameover = pygame.image.load('gameover.png')
+    screen.blit(gameover, (0, 0))
+    while True:
+        pygame.display.update()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
 
-pygame.init()
-screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
-pygame.display.set_caption("MINE")
 
-hero = Hero(hero_img, hero_pos)
+def run():
+    global SCREEN_WIDTH
+    global SCREEN_HEIGHT
+    global FRAME_RATE
+    global ANIMATE_CYCLE
+    screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
+    pygame.display.set_caption("MINE")
 
-enemy_group = pygame.sprite.Group()
-enemy_down_group = pygame.sprite.Group()
+    ticks = 0
+    clock = pygame.time.Clock()
+    offset = {pygame.K_LEFT: 0, pygame.K_RIGHT: 0}
 
-mine_group = pygame.sprite.Group()
+    background = pygame.image.load('sea.png')
+    hero_img = pygame.image.load('hero.png')
+    hero_pos = [300, 80]
+    bomb_img = pygame.image.load('bomb.png')
+    enemy_img = pygame.image.load('enemy.png')
 
-enemy_pos = [-enemy_img.get_width(), randint(120, 460)]
-enemy = Enemy(enemy_img, enemy_pos)
-enemy_group.add(enemy)
+    hero = Hero(hero_img, hero_pos)
 
-while True:
-    clock.tick(FRAME_RATE)
-    if ticks >= ANIMATE_CYCLE:
-        ticks = 0
+    enemy_group = pygame.sprite.Group()
+    enemy_down_group = pygame.sprite.Group()
 
-    screen.blit(background, (0, 0))
-    screen.blit(hero.image, hero.rect)
-    ticks += 1
+    mine_group = pygame.sprite.Group()
 
-    if ticks % 60 == 0:
-        enemy_pos = [-enemy_img.get_width(), randint(120, 460)]
-        enemy = Enemy(enemy_img, enemy_pos)
-        enemy_group.add(enemy)
-    enemy_group.draw(screen)
-    enemy_group.update()
+    enemy_pos = [-enemy_img.get_width(), randint(120, 460)]
+    enemy = Enemy(enemy_img, enemy_pos)
+    enemy_group.add(enemy)
 
-    for enemy in enemy_group:
-        if enemy.rect.left == enemy.minepos:
-            mine_pos = [enemy.rect.left, enemy.rect.top]
-            mine = Mine(mine_image=pygame.image.load(
-                "mine.png"), mine_init_pos=mine_pos)
-            mine_group.add(mine)
-    mine_group.draw(screen)
-    mine_group.update()
+    while True:
+        clock.tick(FRAME_RATE)
+        if ticks >= ANIMATE_CYCLE:
+            ticks = 0
 
-    # 此处加入minegroup和hero的碰撞,碰撞后跳出循环，显示gameover界面
-    boom = None
-    boom = pygame.sprite.spritecollideany(hero, mine_group)
-    if boom is not None:
-        mine_group.remove(mine)
-        break
+        screen.blit(background, (0, 0))
+        screen.blit(hero.image, hero.rect)
+        ticks += 1
 
-    enemy_down_group.add(
-        pygame.sprite.groupcollide(
-            enemy_group,
-            hero.bombgroup,
-            True,
-            True))
+        if ticks % 60 == 0:
+            enemy_pos = [-enemy_img.get_width(), randint(120, 460)]
+            enemy = Enemy(enemy_img, enemy_pos)
+            enemy_group.add(enemy)
+        enemy_group.draw(screen)
+        enemy_group.update()
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            exit()
+        for enemy in enemy_group:
+            if enemy.rect.left == enemy.minepos:
+                mine_pos = [enemy.rect.left, enemy.rect.top]
+                mine = Mine(mine_image=pygame.image.load(
+                    "mine.png"), mine_init_pos=mine_pos)
+                mine_group.add(mine)
+        mine_group.draw(screen)
+        mine_group.update()
 
-        if event.type == pygame.KEYDOWN:
-            if event.key in offset:
-                offset[event.key] = hero.speed
-            if event.key == K_SPACE:
-                hero.single_bomb(bomb_img)
+        # 此处加入minegroup和hero的碰撞,碰撞后跳出循环，显示gameover界面
+        boom = pygame.sprite.spritecollideany(hero, mine_group)
+        if boom is not None:
+            mine_group.remove(mine)
+            break
 
-        elif event.type == pygame.KEYUP:
-            if event.key in offset:
-                offset[event.key] = 0
+        enemy_down_group.add(
+            pygame.sprite.groupcollide(
+                enemy_group,
+                hero.bombgroup,
+                True,
+                True))
 
-    hero.bombgroup.update()
-    hero.bombgroup.draw(screen)
-    hero.move(offset)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
 
-    pygame.display.update()
+            if event.type == pygame.KEYDOWN:
+                if event.key in offset:
+                    offset[event.key] = hero.speed
+                if event.key == K_SPACE:
+                    hero.single_bomb(bomb_img)
 
-screen.blit(gameover, (0, 0))
-while True:
-    pygame.display.update()
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            exit()
+            elif event.type == pygame.KEYUP:
+                if event.key in offset:
+                    offset[event.key] = 0
+
+        hero.bombgroup.update()
+        hero.bombgroup.draw(screen)
+        hero.move(offset)
+
+        pygame.display.update()
+
+
+if __name__ == '__main__':
+    main()
