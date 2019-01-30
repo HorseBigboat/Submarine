@@ -90,6 +90,7 @@ hero_img = pygame.image.load('hero.png')
 hero_pos = [300, 80]
 bomb_img = pygame.image.load('bomb.png')
 enemy_img = pygame.image.load('enemy.png')
+gameover = pygame.image.load('gameover.png')
 
 pygame.init()
 screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
@@ -131,7 +132,12 @@ while True:
     mine_group.draw(screen)
     mine_group.update()
 
-    # 此处需要加入minegroup和hero的碰撞
+    # 此处加入minegroup和hero的碰撞,碰撞后跳出循环，显示gameover界面
+    boom = None
+    boom = pygame.sprite.spritecollideany(hero, mine_group)
+    if boom is not None:
+        mine_group.remove(mine)
+        break
 
     enemy_down_group.add(
         pygame.sprite.groupcollide(
@@ -160,3 +166,11 @@ while True:
     hero.move(offset)
 
     pygame.display.update()
+
+screen.blit(gameover, (0, 0))
+while True:
+    pygame.display.update()
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            exit()
