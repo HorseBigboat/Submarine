@@ -168,6 +168,7 @@ def run(screen):
         mine_group.draw(screen)
         mine_group.update()
 
+
         # 英雄与敌人炸弹碰撞
         boom = pygame.sprite.spritecollideany(hero, mine_group)
         if boom is not None:
@@ -209,7 +210,7 @@ def run(screen):
         hero.bombgroup.draw(screen)
         hero.move(offset)
 
-        pygame.display.update()
+        pygame.display.flip()
 
 
 if __name__ == '__main__':
