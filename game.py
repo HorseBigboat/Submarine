@@ -90,9 +90,14 @@ def main():
     pygame.display.set_caption("MINE")
 
     while True:
-        run(screen)
+        score = run(screen)
         gameover = pygame.image.load('gameover.png')
         screen.blit(gameover, (0, 0))
+        myfont = pygame.font.Font(None, 28)
+        black = (0, 0, 0)
+        finalscoreimage = myfont.render("Final Score: " + str(score), 1, black)
+        screen.blit(finalscoreimage, (260, 320))
+
         while True:
             breakflag = False
             if not breakflag:
@@ -101,7 +106,7 @@ def main():
                     if event.type == pygame.QUIT:
                         pygame.quit()
                         exit()
-                    if event.type == pygame.KEYDOWN:   #按任意键重启游戏
+                    if event.type == pygame.KEYDOWN:  # 按任意键重启游戏
                         breakflag = True
             if breakflag:
                 break
@@ -121,6 +126,11 @@ def run(screen):
     hero_pos = [300, 80]
     bomb_img = pygame.image.load('bomb.png')
     enemy_img = pygame.image.load('enemy.png')
+
+    # 得分字体
+    myfont = pygame.font.Font(None, 24)
+    black = (0, 0, 0)
+    white = (255, 255, 255)
 
     hero = Hero(hero_img, hero_pos)
 
@@ -158,17 +168,27 @@ def run(screen):
         mine_group.draw(screen)
         mine_group.update()
 
+        # 英雄与敌人炸弹碰撞
         boom = pygame.sprite.spritecollideany(hero, mine_group)
         if boom is not None:
             mine_group.remove(mine)
-            break
+            return score
 
+        # 敌人与英雄炸弹碰撞
         enemy_down_group.add(
             pygame.sprite.groupcollide(
                 enemy_group,
                 hero.bombgroup,
                 True,
                 True))
+
+        score = len(enemy_down_group) * 10
+        textimage_blind = myfont.render(
+            "score: " + str(score - 10), 1, white)  # 使用白色的得分把之前的textimage遮住
+        background.blit(textimage_blind, (0, 0))
+        textimage = myfont.render("score: " + str(score), 1, black)
+        background.blit(textimage, (0, 0))
+        pygame.display.update()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
