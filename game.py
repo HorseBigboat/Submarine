@@ -49,7 +49,7 @@ class Enemy(pygame.sprite.Sprite):  # 敌人类
         self.rect = self.image.get_rect()
         self.rect.topleft = enemy_init_pos
         self.speed = 2
-        self.minepos = random.randrange(0,640,2)
+        self.minepos = random.randrange(0, 640, 2)
 
     def update(self):
         self.rect.left += self.speed
@@ -64,11 +64,16 @@ class Mine(pygame.sprite.Sprite):  # 敌人水雷类
         self.rect = self.image.get_rect()
         self.rect.topleft = mine_init_pos
         self.speed = 2
+        self.clock = 0
 
     def update(self):
-        self.rect.top -= self.speed
         if self.rect.top <= 90:
             self.rect.top = 90
+            self.clock += 1
+            if self.clock == 100:
+                self.kill()
+        else:
+            self.rect.top -= self.speed
 
 
 SCREEN_WIDTH = 640
