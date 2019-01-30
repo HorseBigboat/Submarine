@@ -87,25 +87,29 @@ def main():
     global SCREEN_WIDTH
     global SCREEN_HEIGHT
     screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
-
     pygame.display.set_caption("MINE")
-    run()
-    gameover = pygame.image.load('gameover.png')
-    screen.blit(gameover, (0, 0))
+
     while True:
-        pygame.display.update()
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                exit()
+        run(screen)
+        gameover = pygame.image.load('gameover.png')
+        screen.blit(gameover, (0, 0))
+        while True:
+            breakflag = False
+            if not breakflag:
+                pygame.display.update()
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        exit()
+                    if event.type == pygame.KEYDOWN:   #按任意键重启游戏
+                        breakflag = True
+            if breakflag:
+                break
 
 
-def run():
-    global SCREEN_WIDTH
-    global SCREEN_HEIGHT
+def run(screen):
     global FRAME_RATE
     global ANIMATE_CYCLE
-    screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
     pygame.display.set_caption("MINE")
 
     ticks = 0
@@ -154,7 +158,6 @@ def run():
         mine_group.draw(screen)
         mine_group.update()
 
-        # 此处加入minegroup和hero的碰撞,碰撞后跳出循环，显示gameover界面
         boom = pygame.sprite.spritecollideany(hero, mine_group)
         if boom is not None:
             mine_group.remove(mine)
