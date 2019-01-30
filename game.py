@@ -1,4 +1,5 @@
 import pygame
+import random
 from pygame.locals import *
 from sys import exit
 from random import randint
@@ -48,6 +49,7 @@ class Enemy(pygame.sprite.Sprite):  # 敌人类
         self.rect = self.image.get_rect()
         self.rect.topleft = enemy_init_pos
         self.speed = 2
+        self.minepos = random.randrange(0,640,2)
 
     def update(self):
         self.rect.left += self.speed
@@ -65,8 +67,8 @@ class Mine(pygame.sprite.Sprite):  # 敌人水雷类
 
     def update(self):
         self.rect.top -= self.speed
-        if self.rect.top == 20:
-            self.kill()
+        if self.rect.top <= 90:
+            self.rect.top = 90
 
 
 SCREEN_WIDTH = 640
@@ -112,20 +114,17 @@ while True:
         enemy_pos = [-enemy_img.get_width(), randint(120, 460)]
         enemy = Enemy(enemy_img, enemy_pos)
         enemy_group.add(enemy)
-
-    # 该处需要更改enemy放地雷的判断条件
-    # 更改为每一个enemy独立设置一个计时器，到一定的tick放mine
-    if ticks % 30 == 0:
-        mine_pos = [enemy.rect.left, enemy.rect.top]
-        mine = Mine(mine_image=pygame.image.load(
-            "mine.png"), mine_init_pos=mine_pos)
-        mine_group.add(mine)
-
-    mine_group.update()
-    mine_group.draw(screen)
-
-    enemy_group.update()
     enemy_group.draw(screen)
+    enemy_group.update()
+
+    for enemy in enemy_group:
+        if enemy.rect.left == enemy.minepos:
+            mine_pos = [enemy.rect.left, enemy.rect.top]
+            mine = Mine(mine_image=pygame.image.load(
+                "mine.png"), mine_init_pos=mine_pos)
+            mine_group.add(mine)
+    mine_group.draw(screen)
+    mine_group.update()
 
     # 此处需要加入minegroup和hero的碰撞
 
