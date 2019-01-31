@@ -83,38 +83,36 @@ class Mine(pygame.sprite.Sprite):  # 敌人水雷类
 
 def main():
     pygame.init()
-
-    global SCREEN_WIDTH
-    global SCREEN_HEIGHT
-    screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
-    pygame.display.set_caption("MINE")
-
+    screen = set_screen(SCREEN_WIDTH, SCREEN_HEIGHT)
     while True:
         score = run(screen)
-        gameover = pygame.image.load('gameover.png')
-        screen.blit(gameover, (0, 0))
-        myfont = pygame.font.Font(None, 28)
-        black = (0, 0, 0)
-        finalscoreimage = myfont.render("Final Score: " + str(score), 1, black)
-        screen.blit(finalscoreimage, (260, 320))
+        game_over(screen, score)
 
-        while True:
-            breakflag = False
-            if not breakflag:
-                pygame.display.update()
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        pygame.quit()
-                        exit()
-                    if event.type == pygame.KEYDOWN:  # 按任意键重启游戏
-                        breakflag = True
-            if breakflag:
-                break
+
+def game_over(screen, score):
+    gameover = pygame.image.load('gameover.png')
+    myfont = pygame.font.Font(None, 28)
+    black = (0, 0, 0)
+    finalscoreimage = myfont.render("Final Score: " + str(score), 1, black)
+    while True:
+        screen.blit(gameover, (0, 0))
+        screen.blit(finalscoreimage, (260, 320))
+        pygame.display.update()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            if event.type == pygame.KEYDOWN:  # 按任意键重启游戏
+                return
+
+
+def set_screen(width, height):
+    screen = pygame.display.set_mode([width, height])
+    pygame.display.set_caption("MINE")
+    return screen
 
 
 def run(screen):
-    global FRAME_RATE
-    global ANIMATE_CYCLE
     pygame.display.set_caption("MINE")
 
     ticks = 0
@@ -168,7 +166,6 @@ def run(screen):
         mine_group.draw(screen)
         mine_group.update()
 
-
         # 英雄与敌人炸弹碰撞
         boom = pygame.sprite.spritecollideany(hero, mine_group)
         if boom is not None:
@@ -184,8 +181,8 @@ def run(screen):
                 True))
 
         score = len(enemy_down_group) * 10
-        textimage_blind = myfont.render(
-            "score: " + str(score - 10), 1, white)  # 使用白色的得分把之前的textimage遮住
+        # 使用白色的得分把之前的textimage遮住(后续更改)
+        textimage_blind = myfont.render("score: " + str(score - 10), 1, white)
         background.blit(textimage_blind, (0, 0))
         textimage = myfont.render("score: " + str(score), 1, black)
         background.blit(textimage, (0, 0))
